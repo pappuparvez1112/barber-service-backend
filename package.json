@@ -1,5 +1,5 @@
 {
-  "name": "book-catalog-backend-service",
+  "name": "barber-service-backend-service",
   "version": "1.0.0",
   "description": "",
   "main": "src/server.ts",
