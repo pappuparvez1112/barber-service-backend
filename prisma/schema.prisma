@@ -1,0 +1,86 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  fullName     String
+  role         String
+  password     String
+  contactNo    String
+  address      String
+  profileImg   String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  appointments Appointment[]
+
+  @@map("users")
+}
+
+model Admin {
+  id         String   @id @default(uuid())
+  email      String   @unique
+  fullName   String
+  role       String
+  password   String
+  contactNo  String
+  address    String
+  profileImg String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("admin")
+}
+
+model Category {
+  id        String    @id @default(uuid())
+  title     String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  services  Service[]
+
+  @@map("categories")
+}
+
+model Service {
+  id           String   @id @default(uuid())
+  price        String
+  description  String
+  serviceImage String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  categoryId  String
+  category    Category      @relation(fields: [categoryId], references: [id])
+  Appointment Appointment[]
+
+  @@map("services")
+}
+
+model Appointment {
+  id              String   @id @default(uuid())
+  appointmentDate DateTime @default(now())
+  status          String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  userId          String
+  users           User     @relation(fields: [userId], references: [id])
+  serviceId       String
+  service         Service  @relation(fields: [serviceId], references: [id])
+
+  @@map("appointments")
+}
+
+enum AppointmentSummaryStatus {
+  pending
+  booked
+}
