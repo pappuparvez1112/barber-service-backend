@@ -58,7 +58,7 @@ const createAdmin = async (user: User): Promise<User> => {
   );
   console.log(user.password);
 
-  const result = await prisma.user.create({
+  const result = await prisma.admin.create({
     data: {
       ...user,
       role: 'admin',
