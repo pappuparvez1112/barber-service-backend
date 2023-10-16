@@ -1,57 +1,141 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import bcrypt from 'bcrypt';
-
-import httpStatus from 'http-status';
 import { Secret } from 'jsonwebtoken';
 
 import { PrismaClient } from '@prisma/client';
 
-import config from '../../../config';
+import httpStatus from 'http-status';
 import ApiError from '../../../errors/ApiError';
 import { jwtHelpers } from '../../../helpers/jwtHelpers';
-import { ILoginUser, ILoginUserResponse } from './auth.interface';
 
 const prisma = new PrismaClient();
 
-const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
-  const { email, password } = payload;
-
-  const isUserExist = await prisma.user.findUnique({
-    where: { email },
+const loginUser = async (payload: any): Promise<any> => {
+  const { email, password }: { email: string; password: string } = payload;
+  let isUserExist: any;
+  const admin = await prisma.admin.findUnique({
+    where: {
+      email,
+    },
   });
-  console.log(isUserExist, 'user');
-  if (!isUserExist) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist');
-  }
-  // const PasswordMatched =await prisma.user.findUnique(password);
-  //   };
 
+  const user = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+  });
+  if (!admin && !user) {
+    throw new Error('User does not exist');
+  }
+
+  if (admin || user) {
+    isUserExist = admin || user;
+  }
   const PasswordMatched = await bcrypt.compare(password, isUserExist.password);
   console.log(PasswordMatched, 'password');
 
   if (!PasswordMatched) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Password is incorrect');
   }
-
-  //create access token & refresh token
-  const { email: adminEmail, role } = isUserExist;
-
-  const token = jwtHelpers.createToken(
-    { adminEmail, role },
-    config.jwt.secret as Secret,
-    config.jwt.expires_in as string
+  // if (isUserExist && isUserExist.password !== password) {
+  //   throw new Error('Password is incorrect');
+  // }
+  const payloadData = {
+    email: isUserExist!.email,
+    role: isUserExist!.role,
+    contactNo: isUserExist!.contactNo,
+    fullName: isUserExist!.fullName,
+  };
+  //create token
+  const accessToken = jwtHelpers.createToken(
+    payloadData,
+    process.env.JWT_SECRET as Secret,
+    process.env.JWT_EXPIRES_IN as string
   );
+  return { accessToken };
+};
+// const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
+//   const { email, password } = payload;
 
-  // const refreshToken = jwtHelpers.createToken(
-  //   { adminEmail, role },
-  //   config.jwt.refresh_secret as Secret,
-  //   config.jwt.refresh_expires_in as string
-  // );
+//   const isUserExist = await prisma.user.findUnique({
+//     where: { email },
+//   });
+//   console.log(isUserExist, 'user');
+//   if (!isUserExist) {
+//     throw new ApiError(httpStatus.NOT_FOUND, 'User does not exist');
+//   }
+//   // const PasswordMatched =await prisma.user.findUnique(password);
+//   //   };
 
-  // console.log(accessToken, 'token');
+//   const PasswordMatched = await bcrypt.compare(password, isUserExist.password);
+//   console.log(PasswordMatched, 'password');
 
+//   if (!PasswordMatched) {
+//     throw new ApiError(httpStatus.UNAUTHORIZED, 'Password is incorrect');
+//   }
+
+//   //create access token & refresh token
+//   const { email: adminEmail, role } = isUserExist;
+
+//   const token = jwtHelpers.createToken(
+//     { adminEmail, role },
+//     config.jwt.secret as Secret,
+//     config.jwt.expires_in as string
+//   );
+
+//   // const refreshToken = jwtHelpers.createToken(
+//   //   { adminEmail, role },
+//   //   config.jwt.refresh_secret as Secret,
+//   //   config.jwt.refresh_expires_in as string
+//   // );
+
+//   // console.log(accessToken, 'token');
+
+//   return {
+//     token,
+//     // refreshToken,
+//   };
+// };
+
+const refreshToken = async (token: string) => {
+  if (!token) {
+    throw new Error('Token is required');
+  }
+  const decodedToken = jwtHelpers.decodeToken(token);
+  const { email, role, contactNo, fullName } = decodedToken;
+  if (!email || !role || !contactNo || !fullName) {
+    throw new Error('Invalid Token');
+  }
+
+  const admin = await prisma.admin.findUnique({
+    where: {
+      email,
+    },
+  });
+
+  const user = await prisma.user.findUnique({
+    where: {
+      email,
+    },
+  });
+  if (!admin && !user) {
+    throw new Error('User does not exist');
+  }
+
+  const payloadData = {
+    email: email,
+    role: role,
+    contactNo: contactNo,
+    fullName: fullName,
+  };
+  const newAccessToken = jwtHelpers.createToken(
+    payloadData,
+    process.env.JWT_SECRET as Secret,
+    process.env.JWT_EXPIRES_IN as string
+  );
   return {
-    token,
-    // refreshToken,
+    accessToken: newAccessToken,
   };
 };
 
@@ -98,5 +182,6 @@ const loginUser = async (payload: ILoginUser): Promise<ILoginUserResponse> => {
 
 export const AuthService = {
   loginUser,
+  refreshToken,
   // refreshToken,
 };

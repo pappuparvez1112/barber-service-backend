@@ -1,6 +1,3 @@
--- CreateEnum
-CREATE TYPE "AppointmentSummaryStatus" AS ENUM ('pending', 'booked');
-
 -- CreateTable
 CREATE TABLE "users" (
     "id" TEXT NOT NULL,
@@ -46,6 +43,7 @@ CREATE TABLE "categories" (
 -- CreateTable
 CREATE TABLE "services" (
     "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
     "price" TEXT NOT NULL,
     "description" TEXT NOT NULL,
     "serviceImage" TEXT,
@@ -60,7 +58,7 @@ CREATE TABLE "services" (
 CREATE TABLE "appointments" (
     "id" TEXT NOT NULL,
     "appointmentDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "status" "AppointmentSummaryStatus" DEFAULT 'pending',
+    "status" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "userId" TEXT NOT NULL,
@@ -69,11 +67,30 @@ CREATE TABLE "appointments" (
     CONSTRAINT "appointments_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "reviewAndRating" (
+    "id" TEXT NOT NULL,
+    "review" TEXT NOT NULL,
+    "rating" INTEGER NOT NULL,
+    "userId" TEXT NOT NULL,
+    "serviceId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "reviewAndRating_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "admin_email_key" ON "admin"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "reviewAndRating_userId_key" ON "reviewAndRating"("userId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "reviewAndRating_serviceId_key" ON "reviewAndRating"("serviceId");
 
 -- AddForeignKey
 ALTER TABLE "services" ADD CONSTRAINT "services_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "categories"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -83,3 +100,9 @@ ALTER TABLE "appointments" ADD CONSTRAINT "appointments_userId_fkey" FOREIGN KEY
 
 -- AddForeignKey
 ALTER TABLE "appointments" ADD CONSTRAINT "appointments_serviceId_fkey" FOREIGN KEY ("serviceId") REFERENCES "services"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "reviewAndRating" ADD CONSTRAINT "reviewAndRating_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "reviewAndRating" ADD CONSTRAINT "reviewAndRating_serviceId_fkey" FOREIGN KEY ("serviceId") REFERENCES "services"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

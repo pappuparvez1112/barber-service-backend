@@ -9,11 +9,53 @@ const createService = async (service: Service): Promise<Service> => {
   return result;
 };
 
-const getAllServices = async (): Promise<Service[] | any> => {
-  const result = await prisma.service.findMany();
+const getAllServices = async (
+  page: number,
+  limit: number,
+  sortBy: string,
+  sortOrder: 'asc' | 'desc',
+  searchTerm: string,
+  filtersData: Record<string, unknown>
+): Promise<Service[] | any> => {
+  const result = await prisma.service.findMany({
+    where: {
+      AND: [
+        {
+          OR: [
+            {
+              category: {
+                title: {
+                  contains: searchTerm,
+                  mode: 'insensitive',
+                },
+              },
+            },
+          ],
+        },
+        {
+          category: {
+            title: {
+              equals: filtersData.category as string,
+              mode: 'insensitive',
+            },
+          },
+        },
+      ],
+    },
+    include: {
+      category: true,
+    },
+    take: limit,
+    skip: (page - 1) * limit,
+    orderBy: {
+      [sortBy]: sortOrder,
+    },
+  });
   const total = await prisma.service.count();
   return {
     meta: {
+      page,
+      limit,
       total,
     },
     data: result,

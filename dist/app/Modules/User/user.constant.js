@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.userFilterableFields = exports.userSearchableFields = exports.UserBudget = exports.UserRole = void 0;
-exports.UserRole = ['Customer', 'Admin'];
+exports.UserRole = ['user', 'admin'];
 exports.UserBudget = 30000;
 exports.userSearchableFields = [
     'id',

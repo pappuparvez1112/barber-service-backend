@@ -13,7 +13,11 @@ const createToken = (payload, secret, expireTime) => {
 const verifyToken = (token, secret) => {
     return jsonwebtoken_1.default.verify(token, secret);
 };
+const decodeToken = (token) => {
+    return jsonwebtoken_1.default.decode(token);
+};
 exports.jwtHelpers = {
     createToken,
     verifyToken,
+    decodeToken,
 };

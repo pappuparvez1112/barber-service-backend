@@ -43,12 +43,25 @@ const getSingleUser = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         res.send(err);
     }
 });
-const insertIntoDB = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const createUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const result = yield user_service_1.UserService.insertIntoDB(req.body);
+        const result = yield user_service_1.UserService.createUser(req.body);
         res.send({
             success: true,
             message: 'User created successfully',
+            data: result,
+        });
+    }
+    catch (err) {
+        res.send(err);
+    }
+});
+const createAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const result = yield user_service_1.UserService.createAdmin(req.body);
+        res.send({
+            success: true,
+            message: 'Admin created successfully',
             data: result,
         });
     }
@@ -78,7 +91,8 @@ const deleteFromDB = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, v
     });
 }));
 exports.UserController = {
-    insertIntoDB,
+    createUser,
+    createAdmin,
     getAllUsers,
     getSingleUser,
     updateIntoDB,

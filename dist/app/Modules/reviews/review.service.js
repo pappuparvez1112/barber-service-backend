@@ -12,28 +12,47 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.OrderService = void 0;
+exports.ReviewAndRatingService = void 0;
 const prisma_1 = __importDefault(require("../../../shared/prisma"));
 const insertIntoDB = (data) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield prisma_1.default.order.create({
+    const result = yield prisma_1.default.reviewAndRating.create({
         data,
     });
     return result;
 });
 const getAllFromDB = () => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield prisma_1.default.order.findMany({});
+    const result = yield prisma_1.default.reviewAndRating.findMany({});
     return result;
 });
 const getByIdFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield prisma_1.default.order.findUnique({
+    const result = yield prisma_1.default.reviewAndRating.findUnique({
         where: {
             id,
         },
     });
     return result;
 });
-exports.OrderService = {
+const updateOneInDB = (id, payload) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield prisma_1.default.reviewAndRating.update({
+        where: {
+            id,
+        },
+        data: payload,
+    });
+    return result;
+});
+const deleteByIdFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield prisma_1.default.reviewAndRating.delete({
+        where: {
+            id,
+        },
+    });
+    return result;
+});
+exports.ReviewAndRatingService = {
     insertIntoDB,
     getAllFromDB,
     getByIdFromDB,
+    updateOneInDB,
+    deleteByIdFromDB,
 };

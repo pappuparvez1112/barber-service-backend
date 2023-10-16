@@ -11,17 +11,18 @@ datasource db {
 }
 
 model User {
-  id           String        @id @default(uuid())
-  email        String        @unique
-  fullName     String
-  role         String
-  password     String
-  contactNo    String
-  address      String
-  profileImg   String?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  appointments Appointment[]
+  id              String           @id @default(uuid())
+  email           String           @unique
+  fullName        String
+  role            String
+  password        String
+  contactNo       String
+  address         String
+  profileImg      String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  appointments    Appointment[]
+  ReviewAndRating ReviewAndRating?
 
   @@map("users")
 }
@@ -53,15 +54,17 @@ model Category {
 
 model Service {
   id           String   @id @default(uuid())
+  name         String
   price        String
   description  String
   serviceImage String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  categoryId  String
-  category    Category      @relation(fields: [categoryId], references: [id])
-  Appointment Appointment[]
+  categoryId      String
+  category        Category         @relation(fields: [categoryId], references: [id])
+  Appointment     Appointment[]
+  ReviewAndRating ReviewAndRating?
 
   @@map("services")
 }
@@ -80,7 +83,20 @@ model Appointment {
   @@map("appointments")
 }
 
-enum AppointmentSummaryStatus {
-  pending
-  booked
+model ReviewAndRating {
+  id        String   @id @default(uuid())
+  review    String
+  rating    Int
+  userId    String   @unique
+  serviceId String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Define relationships to the User and Book models
+  user    User    @relation(fields: [userId], references: [id])
+  service Service @relation(fields: [serviceId], references: [id])
+
+  // Define a unique constraint to ensure each user can only review a book once
+
+  @@map("reviewAndRating")
 }

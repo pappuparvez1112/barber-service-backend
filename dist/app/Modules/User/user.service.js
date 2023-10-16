@@ -22,7 +22,7 @@ const getAllUsers = () => __awaiter(void 0, void 0, void 0, function* () {
         select: {
             id: true,
             email: true,
-            name: true,
+            fullName: true,
             role: true,
             contactNo: true,
             address: true,
@@ -39,7 +39,7 @@ const getSingleUsers = (id) => __awaiter(void 0, void 0, void 0, function* () {
         select: {
             id: true,
             email: true,
-            name: true,
+            fullName: true,
             role: true,
             contactNo: true,
             address: true,
@@ -48,11 +48,19 @@ const getSingleUsers = (id) => __awaiter(void 0, void 0, void 0, function* () {
     });
     return result;
 });
-const insertIntoDB = (data) => __awaiter(void 0, void 0, void 0, function* () {
-    data.password = yield bcrypt_1.default.hash(data.password, Number(config_1.default.bcrypt_salt_rounds));
-    console.log(data.password);
+const createUser = (user) => __awaiter(void 0, void 0, void 0, function* () {
+    user.password = yield bcrypt_1.default.hash(user.password, Number(config_1.default.bcrypt_salt_rounds));
+    console.log(user.password);
     const result = yield prisma.user.create({
-        data,
+        data: Object.assign(Object.assign({}, user), { role: 'user' }),
+    });
+    return result;
+});
+const createAdmin = (user) => __awaiter(void 0, void 0, void 0, function* () {
+    user.password = yield bcrypt_1.default.hash(user.password, Number(config_1.default.bcrypt_salt_rounds));
+    console.log(user.password);
+    const result = yield prisma.user.create({
+        data: Object.assign(Object.assign({}, user), { role: 'admin' }),
     });
     return result;
 });
@@ -74,7 +82,8 @@ const deleteFromDB = (id) => __awaiter(void 0, void 0, void 0, function* () {
     return result;
 });
 exports.UserService = {
-    insertIntoDB,
+    createUser,
+    createAdmin,
     getAllUsers,
     getSingleUsers,
     updateIntoDB,

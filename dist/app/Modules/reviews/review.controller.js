@@ -12,82 +12,63 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BookController = void 0;
+exports.ReviewAndRatingController = void 0;
 const http_status_1 = __importDefault(require("http-status"));
 const catchAsync_1 = __importDefault(require("../../../shared/catchAsync"));
-const pick_1 = __importDefault(require("../../../shared/pick"));
 const sendResponse_1 = __importDefault(require("../../../shared/sendResponse"));
-const book_constant_1 = require("./book.constant");
-const book_service_1 = require("./book.service");
+const review_service_1 = require("./review.service");
 const insertIntoDB = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield book_service_1.BookService.insertIntoDB(req.body);
+    const result = yield review_service_1.ReviewAndRatingService.insertIntoDB(req.body);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: 'Books created successfully',
+        message: 'ReviewAndRating of books created successfully!',
         data: result,
     });
 }));
 const getAllFromDB = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    //  const minPrice = pick(parseFloat(req.query.minPrice || '0'));
-    const filters = (0, pick_1.default)(req.query, book_constant_1.bookFilterableFields);
-    const options = (0, pick_1.default)(req.query, ['limit', 'page', 'sortBy', 'sortOrder']);
-    //   const priceFilter = pick(req.query,['maxPrice','minPrice']);
-    const result = yield book_service_1.BookService.getAllFromDB(filters, options);
+    const result = yield review_service_1.ReviewAndRatingService.getAllFromDB();
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: 'Book fetched successfully',
-        meta: result.meta,
-        data: result.data,
+        message: 'ReviewAndRating of books fetched successfully!',
+        data: result,
     });
 }));
 const getByIdFromDB = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const result = yield book_service_1.BookService.getByIdFromDB(id);
+    const result = yield review_service_1.ReviewAndRatingService.getByIdFromDB(id);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: 'Single book fetched successfully',
+        message: 'ReviewAndRating fetched successfully',
         data: result,
     });
 }));
-const updateIntoDB = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const updateOneInDB = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const payload = req.body;
-    const result = yield book_service_1.BookService.updateIntoDB(id, payload);
+    const result = yield review_service_1.ReviewAndRatingService.updateOneInDB(id, req.body);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: 'Student updated successfully',
+        message: 'ReviewAndRating updated successfully',
         data: result,
     });
 }));
-const deleteFromDB = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const deleteByIdFromDB = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { id } = req.params;
-    const result = yield book_service_1.BookService.deleteFromDB(id);
+    const result = yield review_service_1.ReviewAndRatingService.deleteByIdFromDB(id);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
-        message: 'Student deleted successfully',
+        message: 'Category delete successfully',
         data: result,
     });
 }));
-const getBookCategory = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { id } = req.params;
-    const result = yield book_service_1.BookService.getBookCategory(id);
-    (0, sendResponse_1.default)(res, {
-        statusCode: http_status_1.default.OK,
-        success: true,
-        message: 'books category getting successfully',
-        data: result,
-    });
-}));
-exports.BookController = {
+exports.ReviewAndRatingController = {
     insertIntoDB,
     getAllFromDB,
     getByIdFromDB,
-    getBookCategory,
-    updateIntoDB,
-    deleteFromDB,
+    updateOneInDB,
+    deleteByIdFromDB,
 };
