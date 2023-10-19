@@ -59,7 +59,7 @@ const createUser = (user) => __awaiter(void 0, void 0, void 0, function* () {
 const createAdmin = (user) => __awaiter(void 0, void 0, void 0, function* () {
     user.password = yield bcrypt_1.default.hash(user.password, Number(config_1.default.bcrypt_salt_rounds));
     console.log(user.password);
-    const result = yield prisma.user.create({
+    const result = yield prisma.admin.create({
         data: Object.assign(Object.assign({}, user), { role: 'admin' }),
     });
     return result;
